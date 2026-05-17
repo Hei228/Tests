@@ -1016,21 +1016,29 @@
     function finishQuiz(isEarly) {
         if (timerInterval) clearInterval(timerInterval);
 
+        // Якщо завершили достроково і на поточному питанні вже є вибрана відповідь —
+        // зберігаємо її дані (бо nextQuestion() їх ще не зберіг)
+        if (isEarly && userAnswers[currentQuestionIdx] !== undefined) {
+            const currentQuestion = quizQuestions[currentQuestionIdx];
+            currentQuestion.userSelectedText = shuffledOptions[userAnswers[currentQuestionIdx]];
+            currentQuestion.correctText = shuffledOptions[correctGlobalIdx];
+            currentQuestion.isUserCorrect = (userAnswers[currentQuestionIdx] === correctGlobalIdx);
+        }
+
         document.getElementById('quiz-screen').classList.remove('active');
         document.getElementById('result-screen').classList.add('active');
 
         // Розрахунок результатів
         let correctCount = 0;
-        let totalCount = isEarly ? currentQuestionIdx : quizQuestions.length;
-        
-        // Якщо користувач завершив достроково на питанні, де вже встиг вибрати відповідь
-        if (isEarly && userAnswers[currentQuestionIdx] !== undefined && !isAnswered && quizMode === 'train') {
-             // Для режиму навчання врахуємо поточний стан, якщо кнопка далі активна
-        }
-        
-        // Спеціальний випадок, якщо достроково завершили на першому ж питанні без жодної відповіді
-        if (totalCount === 0 && isEarly) {
-            totalCount = 1; 
+        let totalCount;
+        if (isEarly) {
+            // currentQuestionIdx = кількість питань де вже натиснули "Далі"
+            // якщо на поточному питанні є відповідь — додаємо його теж
+            const answeredCurrent = userAnswers[currentQuestionIdx] !== undefined ? 1 : 0;
+            totalCount = currentQuestionIdx + answeredCurrent;
+            if (totalCount === 0) totalCount = 0; // Залишаємо 0, якщо взагалі нічого не відповіли
+        } else {
+            totalCount = quizQuestions.length;
         }
 
         const reviewContainer = document.getElementById('review-container');
