@@ -204,9 +204,7 @@
 
         <button class="btn" style="margin-top: 10px;" onclick="startQuiz()">Почати тестування</button>
     </div>
-<button id="finish-early-btn" onclick="confirmFinishEarly()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 10px;">
-    ❌ Завершити тест достроково
-</button>
+
     <div id="quiz-screen" class="screen">
         <div class="header-status">
             <span id="question-number">Питання 1 з 150</span>
@@ -1312,35 +1310,6 @@
             if (timerInterval) clearInterval(timerInterval);
             finishQuiz();
         }
-        // Функція, яка спрацьовує при натисканні на кнопку "Завершити тест"
-function confirmFinishEarly() {
-    // Показуємо діалогове вікно підтвердження
-    const userConfirmed = confirm("Ви впевнені, що хочете завершити тест достроково? Всі питання, на які ви не відповіли, будуть зараховані як неправильні.");
-    
-    if (userConfirmed) {
-        finishQuizEarly();
-    }
-}
-
-// Функція екстреного підрахунку балів та завершення
-function finishQuizEarly() {
-    // 1. Зупиняємо таймер зворотного відліку (якщо він у тебе є)
-    // Замість 'quizTimer' підстав назву змінної свого таймера, якщо вона інша
-    if (typeof quizTimer !== 'undefined') {
-        clearInterval(quizTimer);
-    }
-    
-    // 2. Викликаємо твою стандартну функцію показу результатів.
-    // Зазвичай у коді сайту вона називається showResults() або endQuiz().
-    // Переконайся, що назва збігається з тією, яка викликається, коли тест закінчується сам!
-    if (typeof showResults === "function") {
-        showResults();
-    } else {
-        alert("Тест завершено! Переходимо до результатів.");
-        // Альтернативний варіант, якщо функція називається інакше
-        displayResults(); 
-    }
-}
     }
 
     function finishQuiz() {
