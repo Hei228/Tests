@@ -231,6 +231,9 @@
         <div class="review-container" id="review-container"></div>
 
         <button class="btn" style="margin-top: 20px;" onclick="restartQuiz()">Головне меню</button>
+        <button class="btn finish-btn" onclick="confirmFinishEarly()" style="background-color: #dc3545; color: white; margin-left: 10px; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+    Завершити тест достроково
+</button>
     </div>
 </div>
 
@@ -1268,7 +1271,20 @@
         }
         showQuestion();
     }
-
+// Функція для дострокового завершення (викликається кнопкою)
+function confirmFinishEarly() {
+    const userConfirmed = confirm("Ви впевнені, що хочете завершити тест достроково? Всі питання, на які ви не відповіли, зарахуються як неправильні.");
+    
+    if (userConfirmed) {
+        // Якщо перед натисканням користувач виділив правильну відповідь, зараховуємо її
+        if (selectedAnswer !== null && selectedAnswer === questions[currentQuestionIndex].correct) {
+            score++;
+        }
+        
+        // Викликаємо твою стандартну функцію показу результатів
+        showFinalResults(); 
+    }
+}
     function updateTimerDisplay() {
         let hours = Math.floor(timeLeft / 3600);
         let minutes = Math.floor((timeLeft % 3600) / 60);
