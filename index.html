@@ -238,6 +238,8 @@
         }
         .review-item.correct { border-left-color: var(--success); }
         .review-item.incorrect { border-left-color: var(--danger); }
+        .review-item.skipped { border-left-color: var(--text-secondary); opacity: 0.75; }
+        .text-skipped { color: var(--text-secondary); font-weight: 600; }
         .review-q { font-weight: 600; margin-bottom: 8px; font-size: 15px; line-height: 1.4; }
         .review-ans { font-size: 14px; margin-top: 5px; line-height: 1.3; }
         .text-success { color: var(--success); font-weight: 600; }
@@ -1993,8 +1995,7 @@
     function finishQuiz(isEarly) {
         if (timerInterval) clearInterval(timerInterval);
 
-        // Якщо завершили достроково і вже вибрали відповідь на поточному питанні —
-        // зберігаємо її (бо nextQuestion() ще не встиг це зробити)
+        // Зберігаємо дані поточного питання якщо вже вибрана відповідь
         if (isEarly && userAnswers[currentQuestionIdx] !== undefined) {
             const cq = quizQuestions[currentQuestionIdx];
             cq.userSelectedText = shuffledOptions[userAnswers[currentQuestionIdx]];
@@ -2005,51 +2006,74 @@
         document.getElementById('quiz-screen').classList.remove('active');
         document.getElementById('result-screen').classList.add('active');
 
-        // Розрахунок результатів
+        // Завжди показуємо ВСІ питання тесту
+        const totalCount = quizQuestions.length;
         let correctCount = 0;
-        let totalCount;
-        if (isEarly) {
-            // currentQuestionIdx = кількість питань де натиснули "Далі"
-            // якщо відповіли на поточне (але ще не "Далі") — рахуємо і його
-            const answeredCurrent = (userAnswers[currentQuestionIdx] !== undefined) ? 1 : 0;
-            totalCount = currentQuestionIdx + answeredCurrent;
-        } else {
-            totalCount = quizQuestions.length;
-        }
-        if (totalCount === 0) totalCount = 1; // захист від нульового показника
+        let answeredCount = 0;
 
         const reviewContainer = document.getElementById('review-container');
         reviewContainer.innerHTML = '';
 
         for (let i = 0; i < totalCount; i++) {
             const q = quizQuestions[i];
-            if (q.isUserCorrect) correctCount++;
+            const wasAnswered = q.userSelectedText !== undefined;
 
-            // Формування картки детального аналізу
+            if (wasAnswered) {
+                answeredCount++;
+                if (q.isUserCorrect) correctCount++;
+            }
+
+            // Для непройдених питань беремо правильну відповідь з оригінального масиву (завжди індекс 0)
+            const correctAnswer = q.correctText || q.a[0];
+
+            let reviewClass, userDisplay, statusBadge, correctLine;
+
+            if (!wasAnswered) {
+                // Питання не було показано або пропущено
+                reviewClass = 'skipped';
+                userDisplay = '— Не дійшли до цього питання';
+                statusBadge = `<span class="text-skipped">⊘ Не пройдено</span>`;
+                correctLine = `<div class="review-ans">Правильна відповідь: <strong class="text-success">${correctAnswer}</strong></div>`;
+            } else if (q.isUserCorrect) {
+                reviewClass = 'correct';
+                userDisplay = q.userSelectedText;
+                statusBadge = `<span class="text-success">✓ Правильно</span>`;
+                correctLine = '';
+            } else {
+                reviewClass = 'incorrect';
+                userDisplay = q.userSelectedText;
+                statusBadge = `<span class="text-danger">✗ Неправильно</span>`;
+                correctLine = `<div class="review-ans">Правильний еталон: <strong class="text-success">${correctAnswer}</strong></div>`;
+            }
+
             const reviewItem = document.createElement('div');
-            reviewItem.className = `review-item ${q.isUserCorrect ? 'correct' : 'incorrect'}`;
-            
-            let userSelectionDisplay = q.userSelectedText ? q.userSelectedText : "<Не надано відповіді>";
-            let statusBadge = q.isUserCorrect ? 
-                `<span class="text-success">✓ Правильно</span>` : 
-                `<span class="text-danger">✗ Неправильно</span>`;
-
+            reviewItem.className = `review-item ${reviewClass}`;
             reviewItem.innerHTML = `
                 <div class="review-q">${i + 1}. ${q.q}</div>
-                <div class="review-ans">Ваша відповідь: <strong>${userSelectionDisplay}</strong> ${statusBadge}</div>
-                ${!q.isUserCorrect ? `<div class="review-ans">Правильний еталон: <strong class="text-success">${q.correctText}</strong></div>` : ''}
+                <div class="review-ans">Ваша відповідь: <strong>${userDisplay}</strong> ${statusBadge}</div>
+                ${correctLine}
             `;
             reviewContainer.appendChild(reviewItem);
         }
 
-        // Виведення текстової статистики
+        // Рахунок: правильні / всього питань у тесті
         document.getElementById('score-text').innerText = `${correctCount} / ${totalCount}`;
-        
-        const scorePercent = totalCount > 0 ? (correctCount / totalCount) * 100 : 0;
+
+        // Відсоток рахуємо тільки по відповіджених питаннях (щоб не карати за дострокове завершення несправедливо)
+        const scorePercent = answeredCount > 0 ? (correctCount / answeredCount) * 100 : 0;
         let comment = '';
-        if (scorePercent >= 90) comment = "Відмінний результат! Ви повністю готові до складання іспиту Крок 3.";
-        else if (scorePercent >= 70.5) comment = "Тест складено! Результат перевищує прохідний бал Крок (70.5%).";
-        else comment = "Прохідний бал не набрано. Рекомендується ретельніше пройти базу в режимі «Навчання».";
+        if (isEarly) {
+            comment = `Тест завершено достроково. Пройдено ${answeredCount} з ${totalCount} питань. `;
+            if (answeredCount > 0) {
+                if (scorePercent >= 90) comment += "Серед відповіджених — відмінний результат!";
+                else if (scorePercent >= 70.5) comment += "Серед відповіджених — прохідний бал набрано.";
+                else comment += "Серед відповіджених — прохідний бал не набрано.";
+            }
+        } else {
+            if (scorePercent >= 90) comment = "Відмінний результат! Ви повністю готові до складання іспиту Крок 3.";
+            else if (scorePercent >= 70.5) comment = "Тест складено! Результат перевищує прохідний бал Крок (70.5%).";
+            else comment = "Прохідний бал не набрано. Рекомендується ретельніше пройти базу в режимі «Навчання».";
+        }
 
         document.getElementById('result-comment').innerText = comment;
     }
