@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Тренажер: Крок 3 Дитяча Хірургія</title>
+    <style>
+        :root {
+            --primary: #007aff;
+            --success: #34c759;
+            --danger: #ff3b30;
+            --background: #f2f2f7;
+            --card: #ffffff;
+            --text: #1c1c1e;
+            --text-secondary: #8e8e93;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            padding: 15px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: var(--card);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+        }
+
+        h1 {
+            font-size: 22px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #000;
+            line-height: 1.3;
+        }
+
+        .screen { display: none; }
+        .active { display: block; }
+
+        .btn {
+            display: block;
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background: #d1d1d6; cursor: not-allowed; }
+
+        .mode-card {
+            background: #fbfbfd;
+            border: 2px solid #e5e5ea;
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode-card.selected {
+            border-color: var(--primary);
+            background: #f2f8ff;
+        }
+
+        .header-status {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e5ea;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        .question-box {
+            background: #f8f8fa;
+            padding: 18px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e5ea;
+        }
+
+        .question-text {
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.5;
+            color: var(--text);
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            background: var(--card);
+            color: var(--text);
+            border: 2px solid #e5e5ea;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            transition: all 0.15s;
+        }
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: #e1f0ff;
+            font-weight: 500;
+        }
+
+        #timer { font-weight: 700; color: var(--danger); }
+
+        .score {
+            font-size: 44px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .review-container {
+            margin-top: 20px;
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 8px;
+            border: 1px solid #e5e5ea;
+            border-radius: 14px;
+            padding: 10px;
+            background: #f8f8fa;
+        }
+        .review-item {
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            background: var(--card);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border-left: 5px solid #ccc;
+        }
+        .review-item.correct { border-left-color: var(--success); }
+        .review-item.incorrect { border-left-color: var(--danger); }
+        .review-q { font-weight: 600; margin-bottom: 8px; font-size: 15px; line-height: 1.4; }
+        .review-ans { font-size: 14px; margin-top: 5px; line-height: 1.3; }
+        .text-success { color: var(--success); font-weight: 600; }
+        .text-danger { color: var(--danger); font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="start-screen" class="screen active">
+        <h1>Крок 3. Дитяча Хірургія<br><span style="font-size:16px; color:var(--text-secondary); font-weight:normal;">Тренажер тестування</span></h1>
+        
+        <div class="mode-card selected" id="mode-full-notime" onclick="selectMode('full', false)">
+            <strong>Повний тест (150 питань)</strong>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Без обмеження часу. Питання кожен раз перемішуються.</p>
+        </div>
+
+        <div class="mode-card" id="mode-full-time" onclick="selectMode('full', true)">
+            <strong>Повний тест + Таймер (2 год 30 хв)</strong>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Режим реального іспиту Крок. 150 випадкових питань з бази.</p>
+        </div>
+
+        <div class="mode-card" id="mode-express" onclick="selectMode('express', false)">
+            <strong>Експрес-тест (30 питань)</strong>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Швидке тренування. 30 випадкових питань без таймеру.</p>
+        </div>
+
+        <button class="btn" style="margin-top: 10px;" onclick="startQuiz()">Почати тестування</button>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <div class="header-status">
+            <span id="question-number">Питання 1 з 150</span>
+            <span id="timer-display">Без таймеру</span>
+        </div>
+        <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        
+        <div class="question-box">
+            <div id="question-text" class="question-text">Завантаження питання...</div>
+        </div>
+        <div id="options-container"></div>
+
+        <button id="next-btn" class="btn" style="margin-top: 15px;" onclick="nextQuestion()" disabled>Далі</button>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h1>Тест завершено!</h1>
+        <div class="score" id="score-text">0 / 0</div>
+        <p id="result-comment" style="text-align: center; color: var(--text-secondary); margin-bottom: 20px; font-weight: 500;"></p>
+
+        <h3 style="margin-bottom: 10px; font-size: 16px;">Детальний аналіз відповідей:</h3>
+        <div class="review-container" id="review-container"></div>
+
+        <button class="btn" style="margin-top: 20px;" onclick="restartQuiz()">Головне меню</button>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // БАЗА ДАНИХ ПИТАНЬ (МАСИВ ДЛЯ ТВОЇХ ТЕСТІВ)
+    // ==========================================
+    // Сюди ми вставимо повний список питань із твоїх файлів Крок 3.
+    // Структура: q - питання, a - варіанти (масив), correct - індекс правильної (0, 1, 2, 3 або 4)
+    const database = [
+        const database = [
+        {
+            q: "У дитини 7 років, яка лікується з приводу гострого гематогенного остеомієліту лівої стегнової кистки, раптово погіршився стан: температура тіла 39,8°C, задишка, біль у грудях, сухий кашель, виражений цианоз. На рентгенограмі легких виявлено множинні вогнищеві тіні з порожнинами розпаду з обох боків. Яке ускладнення розвинулося у дитини?",
+            a: ["Септикопіємічна форма сепсису, метастатична пневмонія", "Токсична форма сепсису", "Двобічна крупозна пневмонія", "Абсцедуюча пневмонія", "Емпієма плеври"],
+            correct: 0
+        },
+        {
+            q: "Дівчинка 3-х років доставлена до клініки через 2 години після того, як випила розчин каустичної соди. Скаржиться на сильний біль у роті та за грудниною, не може ковтати, відмічається значна салівація. При огляді на слизовій оболонці губ та ротової порожнини — ділянки коагуляційного некрозу білого кольору. Які першочергові заходи необхідно вжити на госпітальному етапі?",
+            a: ["Промивання шлунка через зонд великою кількістю холодної води або нейтралізуючими розчинами", "Введення блювотних засобів", "Нейтралізація лугу шляхом введення концентрованої кислоти перорально", "Негайне проведення екстреної гастростомії", "Призначення виключно антибіотикотерапії"],
+            correct: 0
+        },
+        {
+            q: "У новонародженого хлопчика під час першого годування з'явився приступ ядухи, кашель, виділення пінистої слини з рота та носа, виражений ціаноз. Спроба провести катетер у шлунок виявилася невдалою — катетер зупиняється на відстані 10 см від ясен. На оглядовій рентгенографії ОГК та ОЧП з катетером виявлено згортання катетера у сліпому кінці стравоходу та велику кількість газу в шлунку й кишечнику. Яка форма вади розвитку має місце?",
+            a: ["Атрезія стравоходу з нижньою трахеостравохідною норицею", "Ізольована атрезія стравоходу без нориці", "Атрезія стравоходу з верхньою трахеостравохідною норицею", "Н-подібна трахеостравохідна нориця", "Атрезія дванадцятипалої кишки"],
+            correct: 0
+        },
+        {
+            q: "До приймального відділення доставлено дитину віком 10 місяців зі скаргами батьків на періодичне занепокоєння (напади тривають по 3-5 хвилин з інтервалом 15-20 хвилин), під час яких дитина підтягує ніжки до живота, блідне. Напади з'явилися 8 годин тому. Двічі було блювання. На пелюшці виявлено виділення у вигляді 'малинового желе'. При пальпації живота в правому підребер'ї визначається пухлиноподібне утворення. Який найбільш імовірний діагноз?",
+            a: ["Гостра інвагінація кишечника", "Гострий апендицит", "Дизентерія", "Геморагічний васкуліт (хвороба Шенлейна-Геноха)", "Глисна інвазія, кишкова непрохідність"],
+            correct: 0
+        },
+        {
+            q: "У хлопчика 5-ти років через 2 тижні після перенесеної ангіни з'явився набряк калитки, біль під час ходьби. Об'єктивно: права половина калитки збільшена, шкіра над нею гіперемована, гаряча на дотик. Яєчко та його придаток збільшені, щільні, різко болючі під час пальпації. Сім'яний канатик потовщений. Який найбільш імовірний діагноз?",
+            a: ["Гострий орхоепідідиміт", "Перекрут яєчка", "Перекрут гідатиди яєчка", "Защемлена пахово-калиточна грижа", "Травматична гематома калитки"],
+            correct: 0
+        },
+        {
+            q: "Дитина 2-х років госпіталізована до хірургічного стаціонару зі скаргами на задишку, сухий кашель, підвищення температури тіла до 38,7°C. Хворіє 3 дні. Об'єктивно: права половина грудної клітки відстає в акті дихання, міжреберні проміжки згладжені. Перкуторно справа — тупий звук, аускультативно — дихання різко послаблене. На оглядовій рентгенограмі ОГК: гомогенне затемнення правого легеневого поля із зміщенням тіні середостіння в лівий бік. Який діагноз є найімовірнішим?",
+            a: ["Гостра тотальна емпієма плеври справа", "Правобічна вогнищева пневмонія", "Ателектак легені справа", "Чужорідне тіло правих бронхів", "Кіста правої легені"],
+            correct: 0
+        },
+        {
+            q: "У новонародженої дитини з підозрою на кишкову непрохідність на оглядовій рентгенограмі черевної порожнини у вертикальному положенні виявлено один великий міхур газу з рівнем рідини в лівому підребер'ї та повну відсутність газу в інших відділах ШКТ. Для якої вади розвитку характерна така рентгенологічна картина?",
+            a: ["Вроджений ізольований пілоростеноз", "Атрезія дванадцятипалої кишки", "Атрезія тонкої кишки", "Мекконіальний ілеус", "Повна атрезія ануса"],
+            correct: 0
+        },
+        {
+            q: "У дитини 12 років після падіння з дерева з'явився сильний біль у лівому підребер'ї, слабкість, запаморочення. Об'єктивно: шкірні покриви бліді, пульс — 120/хв, слабого наповнення, АТ — 80/40 мм рт.ст. Живіт болючий в лівому підребер'ї, відмічаються позитивні симптоми подразнення очеревини. При перкусії виявлено притуплення в пологих місцях живота, яке не змінюється при зміні положення тіла (симптом 'іванця-киванця'). Яку травму внутрішніх органів можна запідозрити?",
+            a: ["Розрив селезінки, внутрішньочеревна геморагія", "Розрив лівої нирки", "Травматичний розрив шлунка", "Розрив сечового міхура", "Гематома передньої черевної стінки"],
+            correct: 0
+        },
+        {
+            q: "Хлопчик 14 років скаржиться на тупий, тягнучий біль у лівій половині калитки, який посилюється під час фізичного навантаження та тривалого стояння. Об'єктивно: ліве яєчко дещо гіпотрофічне, опущене нижче правого. При пальпації у вертикальному положенні тіла та при натужуванні (проба Вальсальви) над лівим яєчком чітко визначаються конгломерати розширених, звивистих вен сім'яного канатика, що нагадують 'клубок дощових черв'яків'. У горизонтальному положенні вени спадаються. Який найбільш імовірний діагноз?",
+            a: ["Варикоцеле II-III ступеня", "Гідроцеле лівого яєчка", "Кіста сім'яного канатика (сперматоцеле)", "Пухлина лівого яєчка", "Гострий епідидиміт"],
+            correct: 0
+        },
+        {
+            q: "У новонародженої дитини під час огляду в пологовому залі виявлено дефект передньої черевної стінки параумбілікально праворуч розміром 3х4 см, через який назовні евентеровані петлі тонкої та товстої кишки. Евентеровані органи не покриті оболонками, набряклі, фібринозно змінені, злиплися між собою. Пуповина сформована правильно і розташована зліва від дефекту. Яку вроджену ваду розвитку діагностовано?",
+            a: ["Гастрошизис", "Омфалоцеле (грижа пупкового канатика)", "Вроджена пупкова грижа", "Евентрація внаслідок травми", "Екстрофія сечового міхура"],
+            correct: 0
+        }
+    ];
+        // НАСТУПНІ ПИТАННЯ БУДУТЬ ВСТАВЛЕНІ СЮДИ (Див. Крок 2 інструкції)
+    ];
+
+    let quizQuestions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = []; 
+    let selectedOptionIndex = null;
+    let config = { mode: 'full', timed: false };
+    let timerInterval = null;
+    let timeLeft = 0; 
+
+    function selectMode(mode, timed) {
+        config.mode = mode;
+        config.timed = timed;
+        document.querySelectorAll('.mode-card').forEach(card => card.classList.remove('selected'));
+        if(mode === 'express') document.getElementById('mode-express').classList.add('selected');
+        else if(timed) document.getElementById('mode-full-time').classList.add('selected');
+        else document.getElementById('mode-full-notime').classList.add('selected');
+    }
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function startQuiz() {
+        if (database.length === 0) {
+            alert("Помилка: База даних питань порожня.");
+            return;
+        }
+        let shuffled = shuffle([...database]);
+        let limit = config.mode === 'express' ? 30 : 150;
+        quizQuestions = shuffled.slice(0, Math.min(limit, shuffled.length));
+
+        currentQuestionIndex = 0;
+        userAnswers = [];
+        
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+
+        if (config.timed) {
+            timeLeft = (2 * 60 + 30) * 60; 
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    finishQuiz();
+                }
+            }, 1000);
+        } else {
+            document.getElementById('timer-display').innerText = "Без таймеру";
+        }
+        showQuestion();
+    }
+
+    function updateTimerDisplay() {
+        let hours = Math.floor(timeLeft / 3600);
+        let minutes = Math.floor((timeLeft % 3600) / 60);
+        let seconds = timeLeft % 60;
+        document.getElementById('timer-display').innerHTML = `Час: <span id="timer">${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</span>`;
+    }
+
+    function showQuestion() {
+        selectedOptionIndex = null;
+        document.getElementById('next-btn').disabled = true;
+
+        let qData = quizQuestions[currentQuestionIndex];
+        document.getElementById('question-number').innerText = `Питання ${currentQuestionIndex + 1} з ${quizQuestions.length}`;
+        document.getElementById('progress-fill').style.width = `${(currentQuestionIndex / quizQuestions.length) * 100}%`;
+        document.getElementById('question-text').innerText = qData.q;
+
+        let optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        qData.a.forEach((option, index) => {
+            let button = document.createElement('button');
+            button.className = 'option-btn';
+            button.innerText = option;
+            button.onclick = () => {
+                selectedOptionIndex = index;
+                document.querySelectorAll('.option-btn').forEach((b, i) => b.classList.toggle('selected', i === index));
+                document.getElementById('next-btn').disabled = false;
+            };
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function nextQuestion() {
+        userAnswers.push(selectedOptionIndex);
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizQuestions.length) {
+            showQuestion();
+        } else {
+            clearInterval(timerInterval);
+            finishQuiz();
+        }
+    }
+
+    function finishQuiz() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+
+        let correctCount = 0;
+        let reviewContainer = document.getElementById('review-container');
+        reviewContainer.innerHTML = '';
+
+        quizQuestions.forEach((qData, index) => {
+            let uAns = userAnswers[index];
+            let isCorrect = uAns === qData.correct;
+            if (isCorrect) correctCount++;
+
+            let item = document.createElement('div');
+            item.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+            
+            let html = `<div class="review-q">${index + 1}. ${qData.q}</div>`;
+            if (uAns !== undefined) {
+                if (isCorrect) {
+                    html += `<div class="review-ans">Ваша відповідь: <span class="text-success">${qData.a[uAns]}</span></div>`;
+                } else {
+                    html += `<div class="review-ans">Ваша відповідь: <span class="text-danger">${qData.a[uAns]}</span></div>`;
+                    html += `<div class="review-ans">Правильно: <span class="text-success">${qData.a[qData.correct]}</span></div>`;
+                }
+            } else {
+                html += `<div class="review-ans"><span class="text-danger">Час вийшов</span>. Правильно: <span class="text-success">${qData.a[qData.correct]}</span></div>`;
+            }
+            item.innerHTML = html;
+            reviewContainer.appendChild(item);
+        });
+
+        document.getElementById('score-text').innerText = `${correctCount} / ${quizQuestions.length}`;
+        let percent = Math.round((correctCount / quizQuestions.length) * 100);
+        document.getElementById('result-comment').innerText = `Результат: ${percent}% правильних відповідей.`;
+    }
+
+    function restartQuiz() {
+        document.getElementById('result-screen').classList.remove('active');
+        document.getElementById('start-screen').classList.add('active');
+    }
+</script>
+</body>
+</html>
