@@ -1,2 +1,0 @@
-# Tests
-Medical_test
