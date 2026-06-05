@@ -9,7 +9,8 @@
             --primary: #007aff;
             --success: #34c759;
             --danger: #ff3b30;
-            --ai-color: #af52de; /* Спеціальний колір для режиму ШІ */
+            --warning: #ff9500;
+            --ai-color: #af52de; 
             --background: #f2f2f7;
             --card: #ffffff;
             --card2: #f8f8fa;
@@ -27,6 +28,7 @@
             --primary: #0a84ff;
             --success: #30d158;
             --danger: #ff453a;
+            --warning: #ff9f0a;
             --ai-color: #bf5af2;
             --background: #1c1c1e;
             --card: #2c2c2e;
@@ -41,42 +43,15 @@
             --shadow: rgba(0,0,0,0.3);
         }
 
-        .theme-toggle {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: none;
-            background: var(--card);
-            color: var(--text);
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 2px 12px var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s, transform 0.2s;
-            z-index: 1000;
-        }
-        .theme-toggle:active { transform: scale(0.9); }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--background);
             color: var(--text);
-            padding: 15px 10px;
+            padding: 15px 10px 60px 10px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             transition: background-color 0.3s, color 0.3s;
         }
@@ -89,255 +64,231 @@
             border-radius: 20px;
             box-shadow: 0 4px 25px var(--shadow);
             transition: background 0.3s;
+            margin-top: 40px;
         }
 
-        h1 {
-            font-size: 22px;
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--text);
-            line-height: 1.3;
+        /* Top Bar */
+        .top-bar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--card);
+            box-shadow: 0 2px 10px var(--shadow);
+            z-index: 1000;
         }
+        .streak { font-weight: bold; font-size: 16px; color: var(--warning); display: flex; align-items: center; gap: 5px; }
+        .top-tools { display: flex; gap: 15px; }
+        .icon-btn {
+            background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text); transition: transform 0.2s;
+        }
+        .icon-btn:active { transform: scale(0.8); }
+
+        h1 { font-size: 22px; text-align: center; margin-bottom: 20px; color: var(--text); line-height: 1.3; }
 
         .screen { display: none; }
         .active { display: block; }
 
         .btn {
-            display: block;
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: background 0.2s, transform 0.1s;
-            text-align: center;
+            display: block; width: 100%; background: var(--primary); color: white; border: none; padding: 16px;
+            border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer; margin-bottom: 12px;
+            transition: background 0.2s, transform 0.1s; text-align: center;
         }
         .btn:active { transform: scale(0.98); }
         .btn:disabled { background: var(--border); cursor: not-allowed; color: var(--text-secondary); }
+        .btn-warning { background: var(--warning); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-outline { background: transparent; color: var(--text); border: 2px solid var(--border); }
 
-        .finish-btn {
-            background: var(--danger);
-            margin-top: 5px;
-        }
-
+        .modes-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
         .mode-card {
-            background: var(--mode-card-bg);
-            border: 2px solid var(--border);
-            padding: 16px;
-            border-radius: 14px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
+            background: var(--mode-card-bg); border: 2px solid var(--border); padding: 16px; border-radius: 14px;
+            cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
         }
-        .mode-card.selected {
-            border-color: var(--primary);
-            background: var(--option-selected);
-        }
+        .mode-card.selected { border-color: var(--primary); background: var(--option-selected); }
+        .mode-card.ai-card.selected { border-color: var(--ai-color); background: rgba(175, 82, 222, 0.1); }
+        .mode-card.hardcore.selected { border-color: var(--danger); background: rgba(255, 59, 48, 0.1); }
         
-        /* Спеціальний стиль для картки ШІ */
-        .mode-card.ai-card.selected {
-            border-color: var(--ai-color);
-            background: rgba(175, 82, 222, 0.1);
+        .badge {
+            position: absolute; top: 12px; right: 12px; color: white; font-size: 10px; font-weight: bold;
+            padding: 3px 8px; border-radius: 10px; text-transform: uppercase;
         }
-        .ai-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: var(--ai-color);
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 10px;
-            text-transform: uppercase;
-        }
+        .badge-ai { background: var(--ai-color); }
+        .badge-hard { background: var(--danger); }
 
-        .header-status {
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
+        .header-status { display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 14px; margin-bottom: 12px; font-weight: 600; align-items: center;}
+        
+        .progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin-bottom: 15px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s ease; }
 
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            margin-bottom: 25px;
-            overflow: hidden;
+        .nav-grid-container {
+            display: none; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 5px; margin-bottom: 20px;
+            max-height: 150px; overflow-y: auto; padding: 10px; background: var(--card2); border-radius: 10px; border: 1px solid var(--border);
         }
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            transition: width 0.2s ease;
+        .nav-box {
+            width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            background: var(--card); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;
         }
+        .nav-box.answered { background: var(--primary); color: white; border-color: var(--primary); }
+        .nav-box.current { border: 2px solid var(--text); transform: scale(1.1); }
 
-        .question-box {
-            background: var(--card2);
-            padding: 18px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
+        .question-box { background: var(--card2); padding: 18px; border-radius: 14px; margin-bottom: 20px; border: 1px solid var(--border); position: relative; }
+        .question-text { font-size: 17px; font-weight: 600; line-height: 1.5; color: var(--text); padding-right: 30px;}
+        
+        .star-btn {
+            position: absolute; top: 15px; right: 15px; font-size: 24px; color: var(--border); background: none; border: none; cursor: pointer; transition: 0.2s;
         }
-
-        .question-text {
-            font-size: 17px;
-            font-weight: 600;
-            line-height: 1.5;
-            color: var(--text);
-        }
+        .star-btn.active { color: var(--warning); text-shadow: 0 0 10px rgba(255, 149, 0, 0.5); }
 
         .option-btn {
-            display: block;
-            width: 100%;
-            background: var(--option-bg);
-            color: var(--text);
-            border: 2px solid var(--border);
-            padding: 14px 16px;
-            border-radius: 12px;
-            font-size: 15px;
-            text-align: left;
-            cursor: pointer;
-            margin-bottom: 12px;
-            line-height: 1.4;
-            transition: all 0.15s;
+            display: flex; width: 100%; background: var(--option-bg); color: var(--text); border: 2px solid var(--border);
+            padding: 14px 16px; border-radius: 12px; font-size: 15px; text-align: left; cursor: pointer; margin-bottom: 12px; line-height: 1.4; transition: all 0.15s;
         }
+        .option-btn.selected { border-color: var(--primary); background: var(--option-selected); font-weight: 500; }
+        .option-btn.correct-reveal { border-color: var(--success) !important; background: #e6f9ec !important; color: #1e7e34 !important; font-weight: 600; }
+        .option-btn.incorrect-reveal { border-color: var(--danger) !important; background: #ffebe9 !important; color: #bd2130 !important; }
+
+        .score { font-size: 44px; font-weight: 800; color: var(--primary); margin: 15px 0; text-align: center; }
         
-        .option-btn.selected {
-            border-color: var(--primary);
-            background: var(--option-selected);
-            font-weight: 500;
-        }
-        .option-btn.correct-reveal {
-            border-color: var(--success) !important;
-            background: #e6f9ec !important;
-            color: #1e7e34 !important;
-            font-weight: 600;
-        }
-        .option-btn.incorrect-reveal {
-            border-color: var(--danger) !important;
-            background: #ffebe9 !important;
-            color: #bd2130 !important;
-        }
+        .stats-block { background: var(--card2); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); }
+        .stats-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
 
-        #timer { font-weight: 700; color: var(--danger); }
-
-        .score {
-            font-size: 44px;
-            font-weight: 800;
-            color: var(--primary);
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .review-container {
-            margin-top: 20px;
-            max-height: 450px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 10px;
-            background: var(--review-bg);
-        }
-        .review-item {
-            padding: 14px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            background: var(--card);
-            box-shadow: 0 2px 5px var(--shadow);
-            border-left: 5px solid var(--border);
-        }
+        .review-container { margin-top: 20px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 14px; padding: 10px; background: var(--review-bg); }
+        .review-item { padding: 14px; border-radius: 10px; margin-bottom: 12px; background: var(--card); box-shadow: 0 2px 5px var(--shadow); border-left: 5px solid var(--border); }
         .review-item.correct { border-left-color: var(--success); }
         .review-item.incorrect { border-left-color: var(--danger); }
-        .review-item.skipped { border-left-color: var(--text-secondary); opacity: 0.75; }
-        .text-skipped { color: var(--text-secondary); font-weight: 600; }
         .review-q { font-weight: 600; margin-bottom: 8px; font-size: 15px; line-height: 1.4; }
-        .review-ans { font-size: 14px; margin-top: 5px; line-height: 1.3; }
         .text-success { color: var(--success); font-weight: 600; }
         .text-danger { color: var(--danger); font-weight: 600; }
+        .text-warning { color: var(--warning); font-weight: 600; }
     </style>
 </head>
 <body>
 
-<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Змінити тему">🌙</button>
+<div class="top-bar">
+    <div class="streak" id="streak-display">🔥 0 днів</div>
+    <div class="top-tools">
+        <button class="icon-btn" onclick="toggleSound()" id="sound-btn" title="Звук">🔊</button>
+        <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="Тема">🌙</button>
+    </div>
+</div>
 
 <div class="container">
+    
+    <!-- ГОЛОВНЕ МЕНЮ -->
     <div id="start-screen" class="screen active">
-        <h1>Крок 3. Дитяча Хірургія<br><span style="font-size:16px; color:var(--text-secondary); font-weight:normal;">Тренажер тестування</span></h1>
+        <h1>Крок 3. Дитяча Хірургія</h1>
         
-        <div class="mode-card selected" id="card-full" onclick="selectMode('full', false, 'card-full')">
-            <strong>Повний тест (150 питань)</strong>
-            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">База Крок-3. Питання перемішуються. Результати в кінці.</p>
+        <!-- Кнопка відновлення (ховається, якщо немає збереження) -->
+        <button id="resume-btn" class="btn btn-warning" style="display:none; animation: pulse 2s infinite;" onclick="resumeSavedQuiz()">⚠️ Продовжити незавершений тест</button>
+
+        <h3 style="margin-bottom: 10px; font-size: 15px; color: var(--text-secondary);">Основні режими</h3>
+        <div class="modes-grid">
+            <div class="mode-card selected" id="card-full" onclick="selectMode('full', false, 'card-full')">
+                <strong>Іспит (150 питань)</strong>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">База Крок-3. Питання перемішуються. Результати в кінці.</p>
+            </div>
+            <div class="mode-card" id="card-train" onclick="selectMode('train', false, 'card-train')">
+                <strong>Навчання (150 питань)</strong>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Миттєвий показ правильної відповіді.</p>
+            </div>
+            <div class="mode-card ai-card" id="card-ai" onclick="selectMode('ai', false, 'card-ai')">
+                <span class="badge badge-ai">Нове</span>
+                <strong style="color: var(--ai-color);">Тест від ШІ (75 питань)</strong>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Окрема унікальна база сучасних протоколів. Миттєвий аналіз.</p>
+            </div>
         </div>
 
-        <div class="mode-card" id="card-train" onclick="selectMode('train', false, 'card-train')">
-            <strong>Режим «Навчання» (150 питань)</strong>
-            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Миттєвий аналіз: додаток одразу підсвічує правильну відповідь.</p>
-        </div>
-        
-        <div class="mode-card ai-card" id="card-ai" onclick="selectMode('ai', false, 'card-ai')">
-            <span class="ai-badge">Нове</span>
-            <strong style="color: var(--ai-color);">Тестування від ШІ (50 питань)</strong>
-            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Окрема унікальна база питань, згенерована ШІ за сучасними протоколами. Миттєвий аналіз.</p>
+        <h3 style="margin-bottom: 10px; font-size: 15px; color: var(--text-secondary);">Спеціальні режими</h3>
+        <div class="modes-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="mode-card hardcore" id="card-hardcore" onclick="selectMode('hardcore', false, 'card-hardcore')">
+                <span class="badge badge-hard">3 ХП</span>
+                <strong style="color: var(--danger); font-size: 14px;">Виживання</strong>
+            </div>
+            <div class="mode-card" id="card-timer" onclick="selectMode('full', true, 'card-timer')">
+                <strong style="font-size: 14px;">На час (2:30)</strong>
+            </div>
+            <div class="mode-card" id="card-express" onclick="selectMode('express', false, 'card-express')">
+                <strong style="font-size: 14px;">Експрес (30)</strong>
+            </div>
+            <div class="mode-card" id="card-mistakes" onclick="selectMode('mistakes', false, 'card-mistakes')">
+                <strong style="font-size: 14px;">Помилки 📉</strong>
+            </div>
+            <div class="mode-card" id="card-bookmarks" onclick="selectMode('bookmarks', false, 'card-bookmarks')">
+                <strong style="font-size: 14px;">Обране ⭐</strong>
+            </div>
         </div>
 
-        <div class="mode-card" id="card-timer" onclick="selectMode('full', true, 'card-timer')">
-            <strong>Повний тест + Таймер (2 год 30 хв)</strong>
-            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Режим реального іспиту Крок 3. 150 випадкових питань з відліком часу.</p>
-        </div>
-
-        <div class="mode-card" id="card-express" onclick="selectMode('express', false, 'card-express')">
-            <strong>Експрес-тест (30 питань)</strong>
-            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Швидке тренування. 30 випадкових питань без таймеру.</p>
-        </div>
-
-        <button id="start-btn-main" class="btn" style="margin-top: 10px;" onclick="startQuiz()">Почати тестування</button>
+        <button class="btn" style="margin-top: 5px;" onclick="startQuiz()">▶ Почати тестування</button>
+        <button class="btn btn-outline" onclick="showStatsScreen()">📊 Моя Статистика</button>
     </div>
 
+    <!-- ЕКРАН ТЕСТУ -->
     <div id="quiz-screen" class="screen">
         <div class="header-status">
-            <span id="question-number">Питання 1 з 150</span>
+            <div>
+                <span id="question-number" style="margin-right: 10px;">Питання 1/150</span>
+                <button onclick="toggleNavGrid()" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">🗺 Мапа</button>
+            </div>
             <span id="timer-display">Без таймеру</span>
         </div>
+        
+        <div id="nav-grid" class="nav-grid-container"></div>
+        
         <div class="progress-bar">
             <div id="progress-fill" class="progress-fill"></div>
         </div>
         
         <div class="question-box">
-            <div id="question-text" class="question-text">Завантаження питання...</div>
+            <button id="star-btn" class="star-btn" onclick="toggleBookmark()">★</button>
+            <div id="question-text" class="question-text">Завантаження...</div>
         </div>
         <div id="options-container"></div>
 
-        <button id="next-btn" class="btn" style="margin-top: 15px;" onclick="nextQuestion()" disabled>Далі</button>
+        <div style="font-size: 11px; text-align: center; color: var(--text-secondary); margin-bottom: 10px;">
+            Гарячі клавіші: 1-5 (вибір), Enter (наступне)
+        </div>
+
+        <button id="next-btn" class="btn" onclick="nextQuestion()" disabled>Далі (Enter)</button>
         <button class="btn finish-btn" onclick="confirmFinishEarly()">Завершити тест достроково</button>
     </div>
 
+    <!-- ЕКРАН РЕЗУЛЬТАТІВ -->
     <div id="result-screen" class="screen">
-        <h1>Тест завершено!</h1>
+        <h1>Результати</h1>
         <div class="score" id="score-text">0 / 0</div>
-        <p id="result-comment" style="text-align: center; color: var(--text-secondary); margin-bottom: 20px; font-weight: 500;"></p>
+        <p id="result-comment" style="text-align: center; font-weight: 500; margin-bottom: 15px;"></p>
+        
+        <div class="stats-block" style="text-align: center;">
+            <p>Час: <strong id="res-time">00:00</strong></p>
+            <p>Середній час на питання: <strong id="res-avg">0 сек</strong></p>
+        </div>
 
-        <h3 style="margin-bottom: 10px; font-size: 16px;">Детальний аналіз відповідей:</h3>
+        <h3 style="margin-bottom: 10px; font-size: 16px;">Детальний аналіз:</h3>
         <div class="review-container" id="review-container"></div>
 
-        <button class="btn" style="margin-top: 20px;" onclick="restartQuiz()">Головне меню</button>
+        <button class="btn" style="margin-top: 20px;" onclick="goToMain()">Головне меню</button>
+    </div>
+
+    <!-- ЕКРАН СТАТИСТИКИ -->
+    <div id="stats-screen" class="screen">
+        <h1>📊 Моя Статистика</h1>
+        <div class="stats-block">
+            <div class="stats-row"><span>Всього тестів пройдено:</span> <strong id="stat-total-tests">0</strong></div>
+            <div class="stats-row"><span>Всього питань вирішено:</span> <strong id="stat-total-qs">0</strong></div>
+            <div class="stats-row"><span>Середній % успішності:</span> <strong id="stat-avg-score" class="text-primary">0%</strong></div>
+        </div>
+        
+        <h3 style="margin-bottom: 10px; font-size: 16px;">Останні 10 результатів:</h3>
+        <div id="history-container" class="review-container" style="max-height: 200px;"></div>
+
+        <button class="btn" style="margin-top: 20px;" onclick="goToMain()">Назад</button>
     </div>
 </div>
 
 <script>
     // ============================================================================
-    // БАЗА 1: ОРИГІНАЛЬНА БАЗА КРОК-3 (з ваших документів)
+    // БАЗА 1: ОРИГІНАЛЬНА БАЗА КРОК-3 
     // ============================================================================
     const database = [
         {
@@ -366,7 +317,7 @@
             correct: 0
         },
         {
-            q: "У новонародженого хлопчика під час першого годування з'явився приступ ядухи, кашель, виділення пінистої слини з рота та носа, виражений ціаноз. Спроба провести катетер у шлунок виявилися невдалою — катетер зупиняється на відстані 10 см від ясен. На оглядовій рентгенографії ОГК та ОЧП з катетером виявлено згортання катетера у сліпому кінці стравоходу та велику кількість газу в шлунку й кишечнику. Яка форма вади розвитку має місце?",
+            q: "У новонароджного хлопчика під час першого годування з'явився приступ ядухи, кашель, виділення пінистої слини з рота та носа, виражений ціаноз. Спроба провести катетер у шлунок виявилися невдалою — катетер зупиняється на відстані 10 см від ясен. На оглядовій рентгенографії ОГК та ОЧП з катетером виявлено згортання катетера у сліпому кінці стравоходу та велику кількість газу в шлунку й кишечнику. Яка форма вади розвитку має місце?",
             a: ["Атрезія стравоходу з нижньою трахеостравохідною норицею", "Ізольована атрезія стравоходу без нориці", "Атрезія стравоходу з верхньою трахеостравохідною норицею", "Н-подібна трахеостравохідна нориця", "Атрезія дванадцятипалої кишки"],
             correct: 0
         },
@@ -401,8 +352,8 @@
             correct: 0
         },
         {
-            q: "У новонародженої дитини під час огляду в пологовому залі виявлено дефект передньої черевної стінки параумбілікально праворуч розміром 3х4 см, через який назовні евентеровані петлі тонкої та товстої кишки. Евентеровані organs не покриті оболонками, набряклі, фібринозно змінені, злиплися між собою. Пуповина сформована правильно і розташована зліва від дефекту. Яку вроджену ваду розвитку діагностовано?",
-            a: ["Гастрошизис", "Омфалоцеле (грижа пупкового канатика)", "Вроджена пупкова грижа", "Евентрація внаслядок травми", "Екстрофія сечового міхура"],
+            q: "У новонародженої дитини під час огля в пологовому залі виявлено дефект передньої черевної стінки параумбілікально праворуч розміром 3х4 см, через який назовні евентеровані петлі тонкої та товстої кишки. Евентеровані organs не покриті оболонками, набряклі, фібринозно змінені, злиплися між собою. Пуповина сформована правильно і розташована зліва від дефекту. Яку вроджену ваду розвитку діагностовано?",
+            a: ["Гастрошизис", "Омфалоцеле (грижа пупкового канатика)", "Вроджена пупкова грижа", "Евентрація внаслідок травми", "Екстрофія сечового міхура"],
             correct: 0
         },
         {
@@ -421,7 +372,7 @@
             correct: 0
         },
         {
-            q: "Дівчинка 8 років скаржиться на переймоподібний біль у животі, часте сечовиділення, нудоту. Температура 37,5°C. Живіт м'який, болючий в куті між XII ребром та хребтом справа. Симптом Пастернацького позитивний праворуч. В аналізі сечі: лейкоцити покривають все поле зору, бактеріурія. Яка патолікя найбільш імовірна?",
+            q: "Дівчинка 8 років скаржиться на переймоподібний біль у животі, часте сечовиділення, нудоту. Температура 37,5°C. Живіт м'який, болючий в куті між XII ребром та хребтом справа. Симптом Пастернацького позитивний праворуч. В аналізі сечі: лейкоцити покривають все поле зору, бактеріурія. Яка патологія найбільш імовірна?",
             a: ["Гострий пієлонефрит", "Гострий апендицит", "Гострий цистит", "Ниркова коліка", "Аднексит"],
             correct: 0
         },
@@ -586,8 +537,8 @@
             correct: 0
         },
         {
-            q: "У хворого 14 років після падіння з велосипеда з'явився біль та припухлість у ділянці середньої третині ключиці. Об'єктивно: відмічається деформація, плече опущене донизу і зміщене вперед, функція кінцівки різко обмежена. Який вид перелому чи ушкодження є найбільш імовірним?",
-            a: ["Перелом ключиці", "Вивих плеча", "Перелом шийки плечової кістки", "Розрив акроміально-ключичного зчленування", "Забиття плечового суглоба"],
+            q: "У хворого 14 років після падіння з велосипеда з'явився біль та припухлість у ділянці середньої третині ключиці. Об'єктивно: відмічається деформація, плече опущене донизу і зміщене вперед. При пальпації виявляється рухливість уламків кістки та крепітація. Який діагноз?",
+            a: ["Перелом ключиці", "Вивих плеча", "Забій плечового суглоба", "Перелом лопатки", "Розрив акроміального з'єднання"],
             correct: 0
         }
     ];
@@ -1084,18 +1035,87 @@
     ];
 
     // ============================================================================
-    // ЛОГІКА ПРОГРАМИ
+    // СТАН ПРОГРАМИ (State)
     // ============================================================================
-    let quizMode = 'full'; // 'full', 'express', 'train', 'ai'
+    let quizMode = 'full'; // 'full', 'express', 'train', 'ai', 'mistakes', 'bookmarks', 'hardcore'
     let useTimer = false;
     let quizQuestions = [];
     let currentQuestionIdx = 0;
-    let userAnswers = []; // Зберігає індекси вибраних відповідей
-    let shuffledOptions = []; // Містить поточний перемішаний масив рядків відповідей
-    let correctGlobalIdx = 0; // Реальний індекс правильної відповіді в shuffledOptions
-    let timerInterval = null;
+    
+    // Поточні дані сесії
+    let userAnswers = []; // Відповіді юзера
+    let shuffledOptions = []; // Поточні кнопки
+    let correctGlobalIdx = 0; // Індекс вірної відповіді
+    let isAnswered = false; 
+    let hardcoreMistakes = 0; // Для хардкор режиму
     let timeRemaining = 0;
-    let isAnswered = false; // Чи натиснув користувач відповідь на поточному питанні
+    let timerInterval = null;
+
+    // Глобальні дані (Зберігаються в LocalStorage)
+    let savedErrors = JSON.parse(localStorage.getItem('savedErrors')) || {}; 
+    let savedBookmarks = JSON.parse(localStorage.getItem('savedBookmarks')) || [];
+    let savedStats = JSON.parse(localStorage.getItem('savedStats')) || { totalTests: 0, totalQuestions: 0, totalCorrect: 0, history: [] };
+    let soundEnabled = true;
+
+    // Звуки (Синтезовані)
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    function playSound(type) {
+        if (!soundEnabled) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        if (type === 'correct') {
+            osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } else {
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
+    }
+
+    // ── СТРІКИ (СТАЖ) ──
+    function initStreak() {
+        let lastDate = localStorage.getItem('lastPlayDate');
+        let today = new Date().toDateString();
+        let streak = parseInt(localStorage.getItem('streak') || '0');
+        
+        if(lastDate !== today) {
+             let yesterday = new Date();
+             yesterday.setDate(yesterday.getDate() - 1);
+             if(lastDate === yesterday.toDateString()) streak++;
+             else streak = 0; // Скидання, якщо пропущено більше дня
+        }
+        localStorage.setItem('streak', streak.toString());
+        document.getElementById('streak-display').innerText = `🔥 ${streak} днів`;
+    }
+
+    // ── ГАРЯЧІ КЛАВІШІ ──
+    document.addEventListener('keydown', (e) => {
+        if (document.getElementById('quiz-screen').classList.contains('active')) {
+            if (e.key >= '1' && e.key <= '5') {
+                const idx = parseInt(e.key) - 1;
+                const btns = document.querySelectorAll('.option-btn');
+                if (btns[idx] && !btns[idx].disabled) handleOptionClick(idx, btns[idx]);
+            } else if (e.key === 'Enter') {
+                const nextBtn = document.getElementById('next-btn');
+                if (!nextBtn.disabled) nextQuestion();
+            }
+        }
+    });
 
     function shuffleArray(array) {
         const arr = [...array];
@@ -1110,39 +1130,39 @@
         quizMode = mode;
         useTimer = timer;
         document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
-        document.getElementById(cardId).classList.add('selected');
+        if(cardId) document.getElementById(cardId).classList.add('selected');
     }
 
+    // Початок тесту
     function startQuiz() {
-        // Вибір бази
         let activeDatabase = (quizMode === 'ai') ? aiDatabase : database;
         
-        // Рандомізація питань
-        let shuffledDb = shuffleArray(activeDatabase);
-        
-        // Встановлення лімітів питань
-        if (quizMode === 'express') {
-            quizQuestions = shuffledDb.slice(0, 30);
-        } else if (quizMode === 'ai') {
-            quizQuestions = shuffledDb.slice(0, 75); // 75 питань ШІ за запитом
+        if (quizMode === 'mistakes') {
+            const errorQs = activeDatabase.filter(q => savedErrors[q.q] && savedErrors[q.q] > 0);
+            if(errorQs.length === 0) { alert("У вас поки немає збережених помилок! Пройдіть звичайний тест."); return; }
+            quizQuestions = shuffleArray(errorQs);
+        } else if (quizMode === 'bookmarks') {
+            const favQs = activeDatabase.filter(q => savedBookmarks.includes(q.q));
+            if(favQs.length === 0) { alert("У вас немає збережених питань. Натискайте ⭐ під час тесту."); return; }
+            quizQuestions = shuffleArray(favQs);
         } else {
-            quizQuestions = shuffledDb.slice(0, Math.min(150, shuffledDb.length));
+            let shuffledDb = shuffleArray(activeDatabase);
+            if (quizMode === 'express') quizQuestions = shuffledDb.slice(0, 30);
+            else if (quizMode === 'ai') quizQuestions = shuffledDb.slice(0, 75);
+            else quizQuestions = shuffledDb.slice(0, Math.min(150, shuffledDb.length));
         }
 
         currentQuestionIdx = 0;
         userAnswers = [];
+        hardcoreMistakes = 0;
 
-        // Ініціалізація таймеру
         if (useTimer) {
-            timeRemaining = 2 * 60 * 60 + 30 * 60; // 2 години 30 хвилин в секундах
+            timeRemaining = 2 * 60 * 60 + 30 * 60; // 2:30
             updateTimerDisplay();
             timerInterval = setInterval(() => {
                 timeRemaining--;
                 updateTimerDisplay();
-                if (timeRemaining <= 0) {
-                    clearInterval(timerInterval);
-                    finishQuiz(false);
-                }
+                if (timeRemaining <= 0) { clearInterval(timerInterval); finishQuiz(false); }
             }, 1000);
         } else {
             document.getElementById('timer-display').innerText = "Без таймеру";
@@ -1150,6 +1170,8 @@
 
         document.getElementById('start-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
+        
+        buildNavGrid();
         loadQuestion();
     }
 
@@ -1160,141 +1182,227 @@
         document.getElementById('timer-display').innerHTML = `Залишилось: <span id="timer">${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</span>`;
     }
 
+    // ── МАПА ПИТАНЬ (НАВІГАЦІЯ) ──
+    function buildNavGrid() {
+        const grid = document.getElementById('nav-grid');
+        grid.innerHTML = '';
+        for(let i=0; i<quizQuestions.length; i++){
+            let box = document.createElement('div');
+            box.className = 'nav-box';
+            box.innerText = i + 1;
+            box.id = 'nav-box-' + i;
+            box.onclick = () => { if(isAnswered || userAnswers[currentQuestionIdx]!==undefined) jumpToQuestion(i); };
+            grid.appendChild(box);
+        }
+    }
+    
+    function toggleNavGrid() {
+        const grid = document.getElementById('nav-grid');
+        grid.style.display = (grid.style.display === 'grid') ? 'none' : 'grid';
+    }
+
+    function updateNavGridUI() {
+        for(let i=0; i<quizQuestions.length; i++){
+            let box = document.getElementById('nav-box-' + i);
+            if(userAnswers[i] !== undefined) box.classList.add('answered');
+            if(i === currentQuestionIdx) box.classList.add('current');
+            else box.classList.remove('current');
+        }
+    }
+
+    function jumpToQuestion(idx) {
+        // Зберігаємо відповідь поточного, якщо була
+        if(userAnswers[currentQuestionIdx] !== undefined && isAnswered) saveCurrentAnswerData();
+        currentQuestionIdx = idx;
+        loadQuestion();
+    }
+
     function loadQuestion() {
-        isAnswered = false;
-        document.getElementById('next-btn').disabled = true;
-        document.getElementById('next-btn').innerText = "Далі";
+        updateNavGridUI();
+        isAnswered = userAnswers[currentQuestionIdx] !== undefined; // Перевірка чи вже відповідали
+        
+        document.getElementById('next-btn').disabled = !isAnswered;
+        document.getElementById('next-btn').innerText = "Далі (Enter)";
 
         const currentQuestion = quizQuestions[currentQuestionIdx];
         document.getElementById('question-number').innerText = `Питання ${currentQuestionIdx + 1} з ${quizQuestions.length}`;
         document.getElementById('question-text').innerText = currentQuestion.q;
 
-        // Оновлення прогрес-бару
         const progressPercent = (currentQuestionIdx / quizQuestions.length) * 100;
         document.getElementById('progress-fill').style.width = `${progressPercent}%`;
 
-        // Підготовка перемішаних варіантів відповідей
-        const originalOptions = currentQuestion.a;
-        const correctText = originalOptions[currentQuestion.correct];
-        
-        shuffledOptions = shuffleArray(originalOptions);
-        correctGlobalIdx = shuffledOptions.indexOf(correctText);
+        // Зірочка (Обране)
+        const starBtn = document.getElementById('star-btn');
+        if (savedBookmarks.includes(currentQuestion.q)) starBtn.classList.add('active');
+        else starBtn.classList.remove('active');
 
+        // Відновлення або генерація відповідей
         const optionsContainer = document.getElementById('options-container');
         optionsContainer.innerHTML = '';
+
+        if (currentQuestion.savedOptions) {
+            shuffledOptions = currentQuestion.savedOptions;
+            correctGlobalIdx = currentQuestion.savedCorrectIdx;
+        } else {
+            const originalOptions = currentQuestion.a;
+            const correctText = originalOptions[currentQuestion.correct];
+            shuffledOptions = shuffleArray(originalOptions);
+            correctGlobalIdx = shuffledOptions.indexOf(correctText);
+            
+            // Зберігаємо перемішаний стан для цього питання, щоб при поверненні через Мапу варіанти не стрибали
+            currentQuestion.savedOptions = shuffledOptions;
+            currentQuestion.savedCorrectIdx = correctGlobalIdx;
+        }
 
         shuffledOptions.forEach((optionText, index) => {
             const button = document.createElement('button');
             button.className = 'option-btn';
             button.innerText = optionText;
-            button.onclick = () => handleOptionClick(index, button);
+            
+            // Відновлення вигляду, якщо вже відповідали
+            if (isAnswered) {
+                button.disabled = true;
+                if(quizMode === 'train' || quizMode === 'ai' || quizMode === 'hardcore') {
+                    if (index === correctGlobalIdx) button.classList.add('correct-reveal');
+                    if (userAnswers[currentQuestionIdx] === index && index !== correctGlobalIdx) button.classList.add('incorrect-reveal');
+                } else {
+                    if (userAnswers[currentQuestionIdx] === index) button.classList.add('selected');
+                }
+            } else {
+                button.onclick = () => handleOptionClick(index, button);
+            }
             optionsContainer.appendChild(button);
         });
+
+        saveSessionToStorage(); // Автозбереження кожну секунду (при зміні питання)
+    }
+
+    function toggleBookmark() {
+        const qText = quizQuestions[currentQuestionIdx].q;
+        const starBtn = document.getElementById('star-btn');
+        if(savedBookmarks.includes(qText)) {
+            savedBookmarks = savedBookmarks.filter(b => b !== qText);
+            starBtn.classList.remove('active');
+        } else {
+            savedBookmarks.push(qText);
+            starBtn.classList.add('active');
+        }
+        localStorage.setItem('savedBookmarks', JSON.stringify(savedBookmarks));
     }
 
     function handleOptionClick(selectedIndex, clickedButton) {
-        if (isAnswered) return; // Запобігаємо повторному кліку
+        if (isAnswered) return;
+        isAnswered = true;
+        userAnswers[currentQuestionIdx] = selectedIndex;
+        const isCorrect = (selectedIndex === correctGlobalIdx);
 
         const allOptionButtons = document.querySelectorAll('.option-btn');
+        allOptionButtons.forEach(btn => btn.disabled = true);
 
-        if (quizMode === 'train' || quizMode === 'ai') {
-            // РЕЖИМ НАВЧАННЯ ТА ШІ (Миттєве відображення)
-            isAnswered = true;
-            userAnswers[currentQuestionIdx] = selectedIndex;
+        // Відстеження помилок (Додаємо в словник)
+        const qText = quizQuestions[currentQuestionIdx].q;
+        if (!isCorrect) {
+            savedErrors[qText] = (savedErrors[qText] || 0) + 1;
+            playSound('wrong');
+        } else {
+            // Якщо відповів правильно, можна зменшити лічильник помилок (за бажанням)
+            if(savedErrors[qText]) savedErrors[qText] -= 1; 
+            playSound('correct');
+        }
+        localStorage.setItem('savedErrors', JSON.stringify(savedErrors));
 
-            if (selectedIndex === correctGlobalIdx) {
+        // Візуалізація залежно від режиму
+        if (quizMode === 'train' || quizMode === 'ai' || quizMode === 'hardcore' || quizMode === 'mistakes') {
+            if (isCorrect) {
                 clickedButton.classList.add('correct-reveal');
             } else {
                 clickedButton.classList.add('incorrect-reveal');
-                // Знаходимо кнопку з правильною відповіддю і підсвічуємо її зеленим
                 allOptionButtons[correctGlobalIdx].classList.add('correct-reveal');
+                
+                if (quizMode === 'hardcore') {
+                    hardcoreMistakes++;
+                    if(hardcoreMistakes >= 3) {
+                        setTimeout(() => { alert("💀 Ви зробили 3 помилки. Хардкор-режим завершено!"); finishQuiz(true); }, 800);
+                        return;
+                    }
+                }
             }
-            
-            document.getElementById('next-btn').disabled = false;
         } else {
-            // КЛАСИЧНІ РЕЖИМИ (Вибір без негайної підсвітки)
-            allOptionButtons.forEach(btn => btn.classList.remove('selected'));
             clickedButton.classList.add('selected');
-            userAnswers[currentQuestionIdx] = selectedIndex;
-            document.getElementById('next-btn').disabled = false;
         }
+
+        saveCurrentAnswerData();
+        updateNavGridUI();
+        document.getElementById('next-btn').disabled = false;
+        saveSessionToStorage();
+    }
+
+    function saveCurrentAnswerData() {
+        const cq = quizQuestions[currentQuestionIdx];
+        cq.userSelectedText = shuffledOptions[userAnswers[currentQuestionIdx]];
+        cq.correctText = shuffledOptions[correctGlobalIdx];
+        cq.isUserCorrect = (userAnswers[currentQuestionIdx] === correctGlobalIdx);
     }
 
     function nextQuestion() {
-        // Якщо відповідь не була обрана взагалі
         if (userAnswers[currentQuestionIdx] === undefined) return;
-
-        // Збережемо текстові відповіді для фінального рев'ю перед очищенням
-        const currentQuestion = quizQuestions[currentQuestionIdx];
-        currentQuestion.userSelectedText = shuffledOptions[userAnswers[currentQuestionIdx]];
-        currentQuestion.correctText = shuffledOptions[correctGlobalIdx];
-        currentQuestion.isUserCorrect = (userAnswers[currentQuestionIdx] === correctGlobalIdx);
+        saveCurrentAnswerData();
 
         currentQuestionIdx++;
         if (currentQuestionIdx < quizQuestions.length) {
             loadQuestion();
         } else {
-            finishQuiz(false);
+            // Якщо це останнє питання, перевіримо чи всі відповів
+            let allAnswered = true;
+            for(let i=0; i<quizQuestions.length; i++) {
+                if(userAnswers[i] === undefined) {
+                    allAnswered = false;
+                    jumpToQuestion(i);
+                    alert("У вас є пропущені питання!");
+                    break;
+                }
+            }
+            if(allAnswered) finishQuiz(false);
         }
     }
 
     function confirmFinishEarly() {
-        if (confirm("Ви впевнені, що хочете достроково завершити тестування та переглянути поточні результати?")) {
-            finishQuiz(true);
-        }
+        if (confirm("Ви впевнені, що хочете достроково завершити тестування?")) finishQuiz(true);
     }
 
     function finishQuiz(isEarly) {
         if (timerInterval) clearInterval(timerInterval);
-
-        // Зберігаємо дані поточного питання якщо вже вибрана відповідь
-        if (isEarly && userAnswers[currentQuestionIdx] !== undefined) {
-            const cq = quizQuestions[currentQuestionIdx];
-            cq.userSelectedText = shuffledOptions[userAnswers[currentQuestionIdx]];
-            cq.correctText = shuffledOptions[correctGlobalIdx];
-            cq.isUserCorrect = (userAnswers[currentQuestionIdx] === correctGlobalIdx);
-        }
+        if (isEarly && userAnswers[currentQuestionIdx] !== undefined) saveCurrentAnswerData();
 
         document.getElementById('quiz-screen').classList.remove('active');
         document.getElementById('result-screen').classList.add('active');
+        localStorage.removeItem('savedSession'); // Очистка автозбереження
 
-        // Завжди показуємо ВСІ питання тесту
+        // Оновлення стріку
+        localStorage.setItem('lastPlayDate', new Date().toDateString());
+        initStreak();
+
         const totalCount = quizQuestions.length;
         let correctCount = 0;
         let answeredCount = 0;
-
         const reviewContainer = document.getElementById('review-container');
         reviewContainer.innerHTML = '';
 
         for (let i = 0; i < totalCount; i++) {
             const q = quizQuestions[i];
-            const wasAnswered = q.userSelectedText !== undefined;
+            const wasAnswered = userAnswers[i] !== undefined;
+            if (wasAnswered) { answeredCount++; if (q.isUserCorrect) correctCount++; }
 
-            if (wasAnswered) {
-                answeredCount++;
-                if (q.isUserCorrect) correctCount++;
-            }
-
-            // Для непройдених питань беремо правильну відповідь з оригінального масиву (завжди індекс 0)
-            const correctAnswer = q.correctText || q.a[0];
-
+            const correctAnswer = q.correctText || q.a[q.correct];
             let reviewClass, userDisplay, statusBadge, correctLine;
 
             if (!wasAnswered) {
-                // Питання не було показано або пропущено
-                reviewClass = 'skipped';
-                userDisplay = '— Не дійшли до цього питання';
-                statusBadge = `<span class="text-skipped">⊘ Не пройдено</span>`;
+                reviewClass = 'skipped'; userDisplay = '— Пропущено'; statusBadge = `<span class="text-skipped">⊘</span>`;
                 correctLine = `<div class="review-ans">Правильна відповідь: <strong class="text-success">${correctAnswer}</strong></div>`;
             } else if (q.isUserCorrect) {
-                reviewClass = 'correct';
-                userDisplay = q.userSelectedText;
-                statusBadge = `<span class="text-success">✓ Правильно</span>`;
-                correctLine = '';
+                reviewClass = 'correct'; userDisplay = q.userSelectedText; statusBadge = `<span class="text-success">✓</span>`; correctLine = '';
             } else {
-                reviewClass = 'incorrect';
-                userDisplay = q.userSelectedText;
-                statusBadge = `<span class="text-danger">✗ Неправильно</span>`;
+                reviewClass = 'incorrect'; userDisplay = q.userSelectedText; statusBadge = `<span class="text-danger">✗</span>`;
                 correctLine = `<div class="review-ans">Правильний еталон: <strong class="text-success">${correctAnswer}</strong></div>`;
             }
 
@@ -1308,58 +1416,112 @@
             reviewContainer.appendChild(reviewItem);
         }
 
-        // Рахунок: правильні / всього питань у тесті
         document.getElementById('score-text').innerText = `${correctCount} / ${totalCount}`;
-
-        // Відсоток рахуємо тільки по відповіджених питаннях (щоб не карати за дострокове завершення несправедливо)
+        
         const scorePercent = answeredCount > 0 ? (correctCount / answeredCount) * 100 : 0;
-        let comment = '';
-        if (isEarly) {
-            comment = `Тест завершено достроково. Пройдено ${answeredCount} з ${totalCount} питань. `;
-            if (answeredCount > 0) {
-                if (scorePercent >= 90) comment += "Серед відповіджених — відмінний результат!";
-                else if (scorePercent >= 70.5) comment += "Серед відповіджених — прохідний бал набрано.";
-                else comment += "Серед відповіджених — прохідний бал не набрано.";
-            }
+        document.getElementById('result-comment').innerText = isEarly ? `Завершено достроково. Пройдено ${answeredCount} з ${totalCount}.` : (scorePercent >= 70.5 ? "Тест складено!" : "Тест не складено.");
+
+        // Статистика часу
+        let timeSpent = 0;
+        if(useTimer) {
+             timeSpent = (2 * 60 * 60 + 30 * 60) - timeRemaining;
         } else {
-            if (scorePercent >= 90) comment = "Відмінний результат! Ви повністю готові до складання іспиту.";
-            else if (scorePercent >= 70.5) comment = "Тест складено! Результат перевищує прохідний бал (70.5%).";
-            else comment = "Прохідний бал не набрано. Рекомендується ретельніше пройти базу в режимі «Навчання».";
+             // приблизний підрахунок якщо без таймера
+             timeSpent = answeredCount * 15; 
         }
+        let avgTime = answeredCount > 0 ? Math.round(timeSpent / answeredCount) : 0;
+        document.getElementById('res-time').innerText = `${Math.floor(timeSpent/60)} хв ${timeSpent%60} сек`;
+        document.getElementById('res-avg').innerText = `${avgTime} сек/питання`;
 
-        document.getElementById('result-comment').innerText = comment;
+        // Збереження глобальної статистики
+        savedStats.totalTests++;
+        savedStats.totalQuestions += answeredCount;
+        savedStats.totalCorrect += correctCount;
+        savedStats.history.unshift({ date: new Date().toLocaleDateString(), score: Math.round(scorePercent), mode: quizMode });
+        if(savedStats.history.length > 10) savedStats.history.pop();
+        localStorage.setItem('savedStats', JSON.stringify(savedStats));
     }
 
-    function restartQuiz() {
-        document.getElementById('result-screen').classList.remove('active');
+    // ── СТАТИСТИКА ──
+    function showStatsScreen() {
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('stats-screen').classList.add('active');
+        
+        document.getElementById('stat-total-tests').innerText = savedStats.totalTests;
+        document.getElementById('stat-total-qs').innerText = savedStats.totalQuestions;
+        let avgScore = savedStats.totalQuestions > 0 ? Math.round((savedStats.totalCorrect / savedStats.totalQuestions) * 100) : 0;
+        document.getElementById('stat-avg-score').innerText = avgScore + "%";
+
+        const histContainer = document.getElementById('history-container');
+        histContainer.innerHTML = '';
+        savedStats.history.forEach(h => {
+            let div = document.createElement('div');
+            div.className = 'review-item';
+            let color = h.score >= 70.5 ? 'var(--success)' : 'var(--danger)';
+            div.innerHTML = `<strong>${h.date}</strong> — Режим: ${h.mode} — Успішність: <strong style="color:${color}">${h.score}%</strong>`;
+            histContainer.appendChild(div);
+        });
+    }
+
+    // ── АВТОЗБЕРЕЖЕННЯ ──
+    function saveSessionToStorage() {
+        const session = {
+            quizMode, useTimer, currentQuestionIdx, userAnswers, timeRemaining, hardcoreMistakes, quizQuestions
+        };
+        localStorage.setItem('savedSession', JSON.stringify(session));
+    }
+
+    function resumeSavedQuiz() {
+        const session = JSON.parse(localStorage.getItem('savedSession'));
+        if(!session) return;
+        quizMode = session.quizMode; useTimer = session.useTimer; currentQuestionIdx = session.currentQuestionIdx;
+        userAnswers = session.userAnswers; timeRemaining = session.timeRemaining;
+        hardcoreMistakes = session.hardcoreMistakes; quizQuestions = session.quizQuestions;
+
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+        
+        if (useTimer) {
+            timerInterval = setInterval(() => {
+                timeRemaining--; updateTimerDisplay();
+                if (timeRemaining <= 0) { clearInterval(timerInterval); finishQuiz(false); }
+            }, 1000);
+        }
+        buildNavGrid();
+        loadQuestion();
+    }
+
+    function checkSavedSession() {
+        if(localStorage.getItem('savedSession')) document.getElementById('resume-btn').style.display = 'block';
+        else document.getElementById('resume-btn').style.display = 'none';
+    }
+
+    function goToMain() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('start-screen').classList.add('active');
+        checkSavedSession();
     }
 
-    // ── Theme toggle ──
+    // ── Тема ──
     function toggleTheme() {
         const html = document.documentElement;
         const btn = document.getElementById('theme-btn');
         if (html.getAttribute('data-theme') === 'dark') {
-            html.removeAttribute('data-theme');
-            btn.textContent = '🌙';
-            localStorage.setItem('theme', 'light');
+            html.removeAttribute('data-theme'); btn.textContent = '🌙'; localStorage.setItem('theme', 'light');
         } else {
-            html.setAttribute('data-theme', 'dark');
-            btn.textContent = '☀️';
-            localStorage.setItem('theme', 'dark');
+            html.setAttribute('data-theme', 'dark'); btn.textContent = '☀️'; localStorage.setItem('theme', 'dark');
         }
     }
 
-    // Apply saved theme on load
     (function() {
         const saved = localStorage.getItem('theme');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (saved === 'dark' || (!saved && prefersDark)) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('theme-btn').textContent = '☀️';
+            document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('theme-btn').textContent = '☀️';
         }
+        initStreak();
+        checkSavedSession();
     })();
 </script>
-
 </body>
 </html>
